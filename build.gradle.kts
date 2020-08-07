@@ -27,6 +27,9 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
 		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+	implementation("org.apache.logging.log4j:log4j-api:2.13.3")
+	implementation("org.apache.logging.log4j:log4j-core:2.13.3")
+		implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+")
 	}
 }
 

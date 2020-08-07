@@ -1,24 +1,81 @@
 package com.kg.pets.controllers
 
-import com.kg.pets.models.Pets
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.kg.pets.models.Pet
 import com.kg.pets.repo.PetsRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import java.util.*
+import java.util.logging.Logger
 
 @RestController
 class Pets {
+
+    val mapper = jacksonObjectMapper()
+
+    val logger = Logger.getLogger("logger")
 
     @Autowired
     val petsRepo: PetsRepository? = null
 
     @GetMapping("pets")
     @ResponseBody
-    fun getAllPets(): MutableList<Pets>? {
+    fun getAllPets(): MutableList<Pet>? {
         return petsRepo?.findAll()
     }
 
+    @GetMapping("pets/{id}")
+    @ResponseBody
+    fun getPetById(
+            @PathVariable id: Long
+    ): Optional<Pet>? {
+        return petsRepo?.findById(id)
+    }
 
+    @PostMapping("pets/create")
+    fun createPet(
+            @RequestBody pet: Pet
+    ): ResponseEntity<List<Pet>> {
+        return if (!noNullsValidator(mapOfPet(pet))) {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
+        } else {
+            petsRepo?.save(pet)
+            ResponseEntity.ok(listOf(pet))
+        }
+    }
+
+    @DeleteMapping("pets/{id}")
+    fun deletePet(
+            @PathVariable ("id") id: Long
+    ): Unit {
+        return petsRepo!!.deleteById(id)
+    }
+
+    fun mapOfPet(pet: Pet): Map<String, Any> {
+        return mapOf(
+                "name" to pet.name,
+                "age" to pet.age,
+                "gender" to pet.gender,
+                "color" to pet.color,
+                "type" to pet.type
+        )
+    }
+
+    fun noNullsValidator(map: Map<String,Any?>): Boolean {
+        // need to figure out how to prevent allowing 'null' in Long type - change types, perhaps?
+        var result = true
+        loop@ for (e in map) {
+            if (e.value == null) {
+                result = false
+                break@loop
+            }
+        }
+        return result;
+    }
+
+    // "method overrides" - override a save method to add in id
+    //      would apply to all saves of that object type (i think) in that repo
 
 }
