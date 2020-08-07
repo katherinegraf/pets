@@ -1,22 +1,15 @@
 package com.kg.pets.models
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.Table
+import javax.persistence.*
 
 @Entity
 @Table(name = "pets")
-data class Pets (
-    @Id
-    @Column(name = "pet_id")
-    var petId: Long,
-
+data class Pet (
     @Column(name = "name")
     var name: String,
 
-    @Column(name = "owner_id")
-    var ownerId: Long,
+    //@Column(name = "owner_id")
+    //var ownerId: Long,
 
     @Column(name = "age")
     var age: Long,
@@ -25,5 +18,13 @@ data class Pets (
     var gender: String,
 
     @Column(name = "color")
-    var color: String
+    var color: String,
+
+    @Column(name = "type")
+    var type: String
 )
+{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    var petId: Long = 0;
+}
