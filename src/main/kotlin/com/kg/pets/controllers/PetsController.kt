@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.kg.pets.models.Pet
 import com.kg.pets.repo.PetsRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -44,6 +45,27 @@ class Pets {
             petsRepo?.save(pet)
             ResponseEntity.ok(listOf(pet))
         }
+    }
+
+    @PutMapping("pets/edit/{id}")
+    fun editPet(
+            @PathVariable id: Long,
+            @RequestBody petEdits: Map<String, Any>
+    ): ResponseEntity<List<Pet?>> {
+        var editedPet = petsRepo?.findByIdOrNull(id)
+        if (editedPet != null) {
+            for (e in petEdits) {
+                when (e.key) {
+                    "name" -> editedPet.name = petEdits.getValue("name").toString()
+                    "age" -> editedPet.age = petEdits.getValue("age").toString().toLong()
+                    "gender" -> editedPet.gender = petEdits.getValue("gender").toString()
+                    "color" -> editedPet.color = petEdits.getValue("color").toString()
+                    "type" -> editedPet.type = petEdits.getValue("type").toString()
+                    }
+                }
+            petsRepo?.save(editedPet)
+        }
+        return ResponseEntity.ok(listOf(editedPet))
     }
 
     @DeleteMapping("pets/{id}")
