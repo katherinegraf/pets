@@ -47,32 +47,31 @@ class Pets {
         }
     }
 
-    @PutMapping("pets/edit/{id}")
+    @PatchMapping("pets/edit/{id}")
     fun editPet(
             @PathVariable id: Long,
             @RequestBody petEdits: Map<String, Any>
     ): ResponseEntity<List<Pet?>> {
-        var editedPet = petsRepo?.findByIdOrNull(id)
+        val editedPet = petsRepo?.findByIdOrNull(id)
         if (editedPet != null) {
-            for (e in petEdits) {
-                when (e.key) {
-                    "name" -> editedPet.name = petEdits.getValue("name").toString()
-                    "age" -> editedPet.age = petEdits.getValue("age").toString().toLong()
-                    "gender" -> editedPet.gender = petEdits.getValue("gender").toString()
-                    "color" -> editedPet.color = petEdits.getValue("color").toString()
-                    "type" -> editedPet.type = petEdits.getValue("type").toString()
-                    }
+            for (e in petEdits) when (e.key) {
+                "name" -> editedPet.name = e.value.toString()
+                "age" -> editedPet.age = petEdits.getValue("age").toString().toLong()
+                "gender" -> editedPet.gender = petEdits.getValue("gender").toString()
+                "color" -> editedPet.color = petEdits.getValue("color").toString()
+                "type" -> editedPet.type = petEdits.getValue("type").toString()
                 }
             petsRepo?.save(editedPet)
+            return ResponseEntity.ok(listOf(editedPet))
         }
-        return ResponseEntity.ok(listOf(editedPet))
+        return ResponseEntity.notFound().build()
     }
 
     @DeleteMapping("pets/{id}")
     fun deletePet(
             @PathVariable ("id") id: Long
-    ): Unit {
-        return petsRepo!!.deleteById(id)
+    ): Unit? {
+        return petsRepo?.deleteById(id)
     }
 
     fun mapOfPet(pet: Pet): Map<String, Any> {
