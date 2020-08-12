@@ -23,27 +23,33 @@ class Pets {
 
     @GetMapping("pets")
     @ResponseBody
-    fun getAllPets(): MutableList<Pet>? {
-        return petsRepo?.findAll()
+    fun getAllPets(): ResponseEntity<MutableList<Pet>>? {
+        return petsRepo?.findAll()?.let { ResponseEntity.ok(it) }
+        // .let calls the RE block with the preceding 'this/it' as the argument
     }
 
     @GetMapping("pets/{id}")
     @ResponseBody
     fun getPetById(
             @PathVariable id: Long
-    ): Optional<Pet>? {
-        return petsRepo?.findById(id)
+    ): ResponseEntity<List<Pet?>> {
+        val foundPet = petsRepo?.findByIdOrNull(id)
+        return if (foundPet != null) {
+            ResponseEntity.ok(listOf(foundPet))
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
     }
 
     @PostMapping("pets/create")
     fun createPet(
             @RequestBody pet: Pet
     ): ResponseEntity<List<Pet>> {
-        return if (!noNullsValidator(mapOfPet(pet))) {
-            ResponseEntity(HttpStatus.BAD_REQUEST)
-        } else {
+        return if (noNullsValidator(mapOfPet(pet))) {
             petsRepo?.save(pet)
             ResponseEntity.ok(listOf(pet))
+        } else {
+            ResponseEntity(HttpStatus.BAD_REQUEST)
         }
     }
 
@@ -54,24 +60,33 @@ class Pets {
     ): ResponseEntity<List<Pet?>> {
         val editedPet = petsRepo?.findByIdOrNull(id)
         if (editedPet != null) {
-            for (e in petEdits) when (e.key) {
-                "name" -> editedPet.name = e.value.toString()
-                "age" -> editedPet.age = petEdits.getValue("age").toString().toLong()
-                "gender" -> editedPet.gender = petEdits.getValue("gender").toString()
-                "color" -> editedPet.color = petEdits.getValue("color").toString()
-                "type" -> editedPet.type = petEdits.getValue("type").toString()
+            // alternate syntax: for (e in petEdits) when (e.key) {
+            petEdits.forEach { e ->
+                when (e.key) {
+                    "name" -> editedPet.name = e.value.toString()
+                    "age" -> editedPet.age = e.value.toString().toLong()
+                    "gender" -> editedPet.gender = e.value.toString()
+                    "color" -> editedPet.color = e.value.toString()
+                    "type" -> editedPet.type = e.value.toString()
                 }
-            petsRepo?.save(editedPet)
-            return ResponseEntity.ok(listOf(editedPet))
+                petsRepo?.save(editedPet)
+                return ResponseEntity.ok(listOf(editedPet))
+            }
         }
-        return ResponseEntity.notFound().build()
+        return ResponseEntity(HttpStatus.NOT_FOUND)
     }
 
     @DeleteMapping("pets/{id}")
     fun deletePet(
-            @PathVariable ("id") id: Long
-    ): Unit? {
-        return petsRepo?.deleteById(id)
+            @PathVariable("id") id: Long
+    ): ResponseEntity<List<Pet>> {
+        val foundPet = petsRepo?.findByIdOrNull(id)
+        return if (foundPet != null) {
+            petsRepo?.delete(foundPet)
+            ResponseEntity.ok(listOf(foundPet))
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
     }
 
     fun mapOfPet(pet: Pet): Map<String, Any> {
@@ -84,7 +99,7 @@ class Pets {
         )
     }
 
-    fun noNullsValidator(map: Map<String,Any?>): Boolean {
+    fun noNullsValidator(map: Map<String, Any?>): Boolean {
         // need to figure out how to prevent allowing 'null' in Long type - change types, perhaps?
         var result = true
         loop@ for (e in map) {
@@ -100,3 +115,4 @@ class Pets {
     //      would apply to all saves of that object type (i think) in that repo
 
 }
+
