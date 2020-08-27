@@ -8,8 +8,8 @@ data class Pet (
     @Column(name = "name")
     var name: String,
 
-    //@Column(name = "owner_id")
-    //var ownerId: Long,
+    @Column(name = "owner_id")
+    var ownerId: Long,
 
     @Column(name = "age")
     var age: Long,
@@ -28,3 +28,13 @@ data class Pet (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var petId: Long = 0;
 }
+
+data class OwnedPets (
+        var name: String,
+        var type: String,
+        var gender: String,
+        var color: String,
+        var age: Long,
+        var petId: Long
+)
+

@@ -1,14 +1,14 @@
 package com.kg.pets.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.kg.pets.models.Pet
+import com.kg.pets.models.*
 import com.kg.pets.repo.PetsRepository
+import com.kg.pets.services.RestApiService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.*
 import java.util.logging.Logger
 
 @RestController
@@ -111,8 +111,48 @@ class Pets {
         return result;
     }
 
-    // "method overrides" - override a save method to add in id
-    //      would apply to all saves of that object type (i think) in that repo
+    @GetMapping("pets/ownedBy/{ownerId}")
+    fun getPetsForUser(
+            @PathVariable ownerId: Long
+    ): ResponseEntity<Any> {
+        val foundPets = petsRepo?.findPetByOwnerId(ownerId)
+        var listOfOwnedPets: MutableList<OwnedPets> = mutableListOf()
+        return if (foundPets != null) {
+            listOfOwnedPets = givenPetListReturnOwnedPets(foundPets)
+            val owner = RestApiService.getUserByAPI(ownerId)
+            return if (owner != null) {
+                val userAndPets = UserWithListOfOwnedPets(
+                        owner = owner.firstName.plus(" ").plus(owner.lastName),
+                        userId = owner.userId,
+                        petsOwned = listOfOwnedPets
+                )
+                ResponseEntity.ok(userAndPets)
+            } else {
+                ResponseEntity(HttpStatus.NOT_FOUND)
+            }
+        } else {
+            ResponseEntity(HttpStatus.NOT_FOUND)
+        }
+        // next goals: a patch to update something and a post to create a new pet from users
+
+    }
+
+    fun givenPetListReturnOwnedPets(pets: List<Pet>): MutableList<OwnedPets> {
+        val listOfOwnedPets: MutableList<OwnedPets> = mutableListOf()
+        pets.forEach { e ->
+            val buildOwnedPet = OwnedPets(
+                    name = e.name,
+                    type = e.type,
+                    gender = e.gender,
+                    color = e.color,
+                    age = e.age,
+                    petId = e.petId
+            )
+            listOfOwnedPets.add(buildOwnedPet)
+        }
+        return listOfOwnedPets
+    }
 
 }
+
 

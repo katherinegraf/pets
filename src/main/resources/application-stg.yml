@@ -1,0 +1,24 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pets
+    username: postgres
+    password: goosegoose
+  flyway:
+    sql-migration-prefix: V
+    repeatable-sql-migration-prefix: R
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
+server:
+  port: 7000
+
+## running app in staging mode:
+## change environment variable to SPRING_PROFILES_ACTIVE-stg
+## application looks for a matching suffix on an application.yml file
+## if match found, will run in that environment instead
+##
+## to run in production, just change the suffix to something that doesn't match any file
+## app will then run it with the regular, un-suffixed files
