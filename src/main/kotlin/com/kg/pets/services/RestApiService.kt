@@ -15,9 +15,6 @@ open class RestApiService {
 
     companion object {
         fun getUserByAPI(id: Long): User? {
-            // handling below causes problems in Controller
-            // try/catch block? swallow the exception?
-
             val (_, _, result) = USERS_API_BASE_URL.plus(id)
                     .httpGet()
                     .responseObject(User.Deserializer())
@@ -32,10 +29,6 @@ open class RestApiService {
                     user
                 }
             }
-
-            //val (user) = result
-            //return user
         }
     }
-
 }
