@@ -44,10 +44,11 @@ class Pets {
     @PostMapping("pets/create")
     fun createPet(
             @RequestBody pet: Pet
-    ): ResponseEntity<List<Pet>> {
+    ): ResponseEntity<Pet> {
+        logger.info(pet.toString())
         return if (noNullsValidator(mapOfPet(pet))) {
             petsRepo?.save(pet)
-            ResponseEntity.ok(listOf(pet))
+            ResponseEntity.ok(pet)
         } else {
             ResponseEntity(HttpStatus.BAD_REQUEST)
         }
@@ -133,8 +134,6 @@ class Pets {
         } else {
             ResponseEntity(HttpStatus.NOT_FOUND)
         }
-        // next goals: a patch to update something and a post to create a new pet from users
-
     }
 
     fun givenPetListReturnOwnedPets(pets: List<Pet>): MutableList<OwnedPets> {
