@@ -27,15 +27,18 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")}
 	implementation("org.apache.logging.log4j:log4j-api:2.13.3")
 	implementation("org.apache.logging.log4j:log4j-core:2.13.3")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+")
 	implementation ("com.google.code.gson:gson:2.8.5")
-	implementation ("com.squareup.retrofit2:retrofit:2.4.0")
-	implementation ("com.squareup.retrofit2:converter-gson:2.4.0")
+	//implementation ("com.squareup.retrofit2:retrofit:2.4.0")
+	//implementation ("com.squareup.retrofit2:converter-gson:2.4.0")
 	implementation ("com.github.kittinunf.fuel:fuel:2.2.3")
-	}
+	implementation ("org.apache.commons:commons-lang3:3.11")
+	implementation ("org.springframework.security:spring-security-core")
+	implementation ("org.mockito:mockito-core:3.6.28")
+	testImplementation ("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
 }
 
 tasks.withType<Test> {

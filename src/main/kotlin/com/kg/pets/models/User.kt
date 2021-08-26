@@ -6,7 +6,7 @@ import com.google.gson.JsonDeserializer
 import javax.persistence.*
 
 data class User (
-        var userId: Int,
+        var userId: Long,
         var firstName: String? = null,
         var lastName: String? = null,
         var email: String,
@@ -26,6 +26,5 @@ data class UserList (
 
 data class UserWithListOfOwnedPets (
         var owner: String? = null,
-        var userId: Int?,
         var petsOwned: List<OwnedPets>?
 )
